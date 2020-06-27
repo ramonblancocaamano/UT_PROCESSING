@@ -24,7 +24,7 @@ ENTITY processing is
         dout : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
         hsk_rd1 : OUT STD_LOGIC;
         hsk_rd_ok1 : IN STD_LOGIC;     
-        buff_rd_en : OUT STD_LOGIC 
+        buff_wr_en : OUT STD_LOGIC 
     );
 END processing;
 
@@ -32,7 +32,7 @@ ARCHITECTURE behavioral OF processing IS
 
     SIGNAL p_dout : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');  
     SIGNAL p_hsk_rd1 : STD_LOGIC := '0';
-    SIGNAL p_buff_rd_en : STD_LOGIC := '0';
+    SIGNAL p_buff_wr_en : STD_LOGIC := '0';
     
     SIGNAL CAST_SHORT : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '0');
     SIGNAL CAST_LONG : STD_LOGIC_VECTOR(11 DOWNTO 0) := (OTHERS => '0');
@@ -43,7 +43,7 @@ BEGIN
 
     dout <= p_dout;  
     hsk_rd1 <= p_hsk_rd1;
-    buff_rd_en <= p_buff_rd_en;
+    buff_wr_en <= p_buff_wr_en;
 
     WITH resolution SELECT
     RES <= 1 WHEN 0,
@@ -62,7 +62,7 @@ BEGIN
            1 WHEN OTHERS;
     
     PROCESS(rst, clk_radar, en_acquire, en_resolution, resolution, din, overflow, trigger_radar,
-        p_dout, p_hsk_rd1, p_buff_rd_en, CAST_SHORT, CAST_LONG, FULL, RES)
+        p_dout, p_hsk_rd1, p_buff_wr_en, CAST_SHORT, CAST_LONG, FULL, RES)
     
         VARIABLE st_enable : BOOLEAN := FALSE;
         VARIABLE counter0 : INTEGER := 0;
@@ -78,7 +78,7 @@ BEGIN
             counter_res := 1;
             p_hsk_rd1 <= '0'; 
             p_dout <= (OTHERS => '0'); 
-            p_buff_rd_en <= '0';
+            p_buff_wr_en <= '0';
         ELSIF RISING_EDGE(clk_radar) THEN
             IF hsk_rd_ok1 = '1' THEN
                p_hsk_rd1 <= '0'; 
@@ -91,7 +91,7 @@ BEGIN
                     counter0 := 0;
                     counter_res := 1;
                     p_dout <= (OTHERS => '0'); 
-                    p_buff_rd_en <= '0';
+                    p_buff_wr_en <= '0';
                 END IF;
             END IF;
             IF st_enable = TRUE THEN
@@ -102,7 +102,7 @@ BEGIN
                 IF counter0 < NDATA THEN            
                     IF en_resolution = '1'AND counter_res < RES THEN
                         counter_res := counter_res + 1;
-                        p_buff_rd_en <= '0';
+                        p_buff_wr_en <= '0';
                         p_dout <= (OTHERS => '0');  
                     ELSE 
                         IF overflow = '1' THEN
@@ -112,14 +112,14 @@ BEGIN
                         END IF;
                         counter1 := counter1 + 1; 
                         counter_res := 1;
-                        p_buff_rd_en <= '1'; 
+                        p_buff_wr_en <= '1'; 
                     END IF;
                     counter0 := counter0 + 1;
                 ELSE 
                     st_enable := FALSE;
                     counter0 := 0;
                     counter_res := 1;                     
-                    p_buff_rd_en <= '0'; 
+                    p_buff_wr_en <= '0'; 
                     p_dout <= (OTHERS => '0'); 
                 END IF;  
             END IF;     

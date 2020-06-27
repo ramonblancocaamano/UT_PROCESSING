@@ -17,7 +17,7 @@ ENTITY main IS
         dout : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
         hsk_rd1 : OUT STD_LOGIC;
         hsk_rd_ok1 : IN STD_LOGIC;     
-        buff_rd_en : OUT STD_LOGIC 
+        buff_wr_en : OUT STD_LOGIC 
     );
 END main;
 
@@ -39,7 +39,7 @@ ARCHITECTURE behavioral OF main IS
             dout : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
             hsk_rd1 : OUT STD_LOGIC;
             hsk_rd_ok1 : IN STD_LOGIC;     
-            buff_rd_en : OUT STD_LOGIC 
+            buff_wr_en : OUT STD_LOGIC 
         );
     END COMPONENT;
 
@@ -61,7 +61,7 @@ BEGIN
             dout => dout,
             hsk_rd1 => hsk_rd1,
             hsk_rd_ok1 => hsk_rd_ok1,  
-            buff_rd_en => buff_rd_en  
+            buff_wr_en => buff_wr_en  
         );
 
 END behavioral;
